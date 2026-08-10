@@ -649,9 +649,7 @@
       </div>
       <div class="toolbar-right">
         <button class="btn btn-ghost btn-sm" onclick="resetDefaults()" title="重置为默认数据">↺ 重置</button>
-      <button class="btn btn-ghost btn-sm" onclick="saveToFile()" title="保存到本地文件">💾 保存</button>
-        <button class="btn btn-ghost btn-sm" onclick="loadFromFile()" title="从本地文件加载">📂 加载</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportData()" title="导出 JSON">↓ 导出</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportData()" title="导出 JSON">↓ 导出</button>
         <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()" title="导入 JSON">↑ 导入</button>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)" />
       </div>
@@ -821,7 +819,6 @@
 
     const STORAGE_KEY = 'ai_tool_tracker_v2';
     const LEGACY_KEY = 'ai_tool_tracker';
-    let _fileHandle = null;
     let tools = JSON.parse(localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_KEY) || '[]');
 
     // 数据迁移：旧数据补全缺失的字段
@@ -917,84 +914,8 @@
       return brand ? { color: brand.color, path: brand.path } : null;
     }
 
-    let _fileHandle = null;
-    
-    async function persist() {
-      try {
-        if (_fileHandle) {
-          const writable = await _fileHandle.createWritable();
-          await writable.write(JSON.stringify(tools, null, 2));
-          await writable.close();
-          return;
-        }
-      } catch (e) {
-        console.warn('File save failed, using localStorage', e);
-      }
+    function persist() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tools));
-    }
-    
-    async function saveToFile() {
-      try {
-        if (window.showSaveFilePicker) {
-          const handle = await window.showSaveFilePicker({
-            suggestedName: 'ai-tools-data.json',
-            types: [{ description: 'JSON文件', accept: { 'application/json': ['.json'] } }]
-          });
-          _fileHandle = handle;
-          const writable = await handle.createWritable();
-          await writable.write(JSON.stringify(tools, null, 2));
-          await writable.close();
-          toast('✓ 已保存到文件', '💾');
-          return;
-        }
-      } catch (e) {
-        if (e.name !== 'AbortError') toast('✕ 保存失败', '⚠️');
-        return;
-      }
-      toast('提示：请使用 Chrome/Edge 浏览器以支持本地文件保存', 'ℹ️');
-    }
-    
-    async function loadFromFile() {
-      try {
-        if (window.showOpenFilePicker) {
-          const [handle] = await window.showOpenFilePicker({
-            types: [{ description: 'JSON文件', accept: { 'application/json': ['.json'] } }],
-            multiple: false
-          });
-          _fileHandle = handle;
-          const file = await handle.getFile();
-          const text = await file.text();
-          if (text) {
-            const data = JSON.parse(text);
-            if (Array.isArray(data)) {
-              tools = data.map(t => ({
-                ...t,
-                __migrated: true,
-                id: t.id || uid(),
-                name: t.name || '',
-                provider: t.provider || '',
-                category: t.category || 'chat',
-                reset: t.reset ? {
-                  period: t.reset.period || 'weekly',
-                  day: t.reset.day != null ? parseInt(t.reset.day) : 1,
-                  hour: t.reset.hour != null ? parseInt(t.reset.hour) : 0,
-                  minute: t.reset.minute != null ? parseInt(t.reset.minute) : 0,
-                } : { period: 'weekly', day: 1, hour: 0, minute: 0 },
-                expiry: t.expiry ? { period: t.expiry.period || 'monthly', day: t.expiry.day != null ? parseInt(t.expiry.day) : 7 } : { period: 'monthly', day: 7 },
-                quotaPct: t.quotaPct != null && t.quotaPct !== '' ? parseFloat(t.quotaPct) : null,
-                created: t.created || new Date().toISOString()
-              }));
-              persist();
-              renderAll();
-              toast('✓ 已加载 ' + tools.length + ' 条', '📂');
-              return;
-            }
-          }
-          throw new Error('格式错误');
-        }
-      } catch (e) {
-        if (e.name !== 'AbortError') toast('✕ 加载失败：' + e.message, '⚠️');
-      }
     }
 
     function uid() {

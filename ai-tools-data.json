@@ -1,0 +1,110 @@
+[
+  {
+    "name": "ChatGPT Plus",
+    "provider": "OpenAI",
+    "category": "chat",
+    "reset": {
+      "period": "weekly",
+      "day": 1,
+      "hour": 0,
+      "minute": 0
+    },
+    "expiry": {
+      "period": "monthly",
+      "day": 7
+    },
+    "quotaPct": 32.4,
+    "id": "default1",
+    "created": "2026-08-10T04:40:13.077Z"
+  },
+  {
+    "name": "Claude Pro",
+    "provider": "Anthropic",
+    "category": "chat",
+    "reset": {
+      "period": "weekly",
+      "day": 4,
+      "hour": 9,
+      "minute": 0
+    },
+    "expiry": {
+      "period": "monthly",
+      "day": 7
+    },
+    "quotaPct": 61.2,
+    "id": "default2",
+    "created": "2026-08-10T04:40:13.078Z"
+  },
+  {
+    "name": "Cursor",
+    "provider": "Cursor",
+    "category": "coding",
+    "reset": {
+      "period": "monthly",
+      "day": 12,
+      "hour": 0,
+      "minute": 0
+    },
+    "expiry": {
+      "period": "monthly",
+      "day": 12
+    },
+    "quotaPct": 88.5,
+    "id": "default3",
+    "created": "2026-08-10T04:40:13.078Z"
+  },
+  {
+    "name": "Grok",
+    "provider": "xAI",
+    "category": "chat",
+    "reset": {
+      "period": "weekly",
+      "day": 1,
+      "hour": 0,
+      "minute": 0
+    },
+    "expiry": {
+      "period": "monthly",
+      "day": 7
+    },
+    "quotaPct": 17.8,
+    "id": "default4",
+    "created": "2026-08-10T04:40:13.078Z"
+  },
+  {
+    "name": "Kimi",
+    "provider": "Moonshot AI",
+    "category": "chat",
+    "reset": {
+      "period": "weekly",
+      "day": 6,
+      "hour": 0,
+      "minute": 0
+    },
+    "expiry": {
+      "period": "monthly",
+      "day": 20
+    },
+    "quotaPct": null,
+    "id": "default5",
+    "created": "2026-08-10T04:40:13.078Z"
+  },
+  {
+    "name": "Perplexity Pro",
+    "provider": "Perplexity",
+    "category": "search",
+    "reset": {
+      "period": "monthly",
+      "day": 3,
+      "hour": 0,
+      "minute": 0
+    },
+    "expiry": {
+      "period": "monthly",
+      "day": 3
+    },
+    "quotaPct": 44,
+    "id": "default6",
+    "created": "2026-08-10T04:40:13.078Z"
+  }
+]
