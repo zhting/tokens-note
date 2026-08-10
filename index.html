@@ -123,7 +123,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px 18px;
+      padding: 14px 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
@@ -136,9 +136,9 @@
     }
 
     .stat-card .value {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 700;
-      letter-spacing: -1px;
+      letter-spacing: -0.5px;
     }
 
     .stat-card .sub {
@@ -227,10 +227,10 @@
       content: '';
       position: absolute;
       top: 0;
-      bottom: 0;
       left: 0;
-      width: 4px;
-      border-radius: var(--radius) 0 0 var(--radius);
+      right: 0;
+      height: 3px;
+      border-radius: var(--radius) var(--radius) 0 0;
     }
 
     .card.status-ok::before { background: var(--green); }
@@ -239,8 +239,8 @@
     .card.status-reset::before { background: var(--accent); }
 
     .provider-icon {
-      width: 38px; height: 38px;
-      border-radius: 10px;
+      width: 32px; height: 32px;
+      border-radius: 8px;
       display: grid; place-items: center;
       background: linear-gradient(135deg, var(--surface2), var(--surface));
       border: 1px solid var(--border);
@@ -249,7 +249,7 @@
     }
 
     .provider-icon svg {
-      width: 20px; height: 20px;
+      width: 18px; height: 18px;
     }
 
     .provider-custom svg { opacity: 0.4; }
@@ -263,6 +263,122 @@
       align-items: flex-start;
       justify-content: space-between;
       margin-bottom: 16px;
+    }
+
+    /* ── New Card Layout ── */
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.15s;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    .card:hover .card-actions { opacity: 1; }
+
+    .icon-btn {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text2);
+      cursor: pointer;
+      display: grid; place-items: center;
+      font-size: 12px;
+      transition: all 0.15s;
+    }
+
+    .icon-btn:hover { color: var(--text); border-color: #3d4152; }
+    .icon-btn.del:hover { color: var(--red); border-color: var(--red); background: var(--red-soft); }
+
+    .card-icon-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.status-ok { background: var(--green); }
+    .status-dot.status-warning { background: var(--orange); }
+    .status-dot.status-danger { background: var(--red); }
+    .status-dot.status-reset { background: var(--accent); }
+
+    .meta-label {
+      color: var(--text3);
+      white-space: nowrap;
+    }
+
+    .meta-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .meta-value.overdue { color: var(--red); }
+    .meta-value.soon { color: var(--orange); }
+    .meta-value.ok { color: var(--green); }
+    .meta-value.reset { color: var(--accent); }
+
+    .quota-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .quota-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 2px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .quota-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    .quota-pct {
+      font-size: 11px;
+      color: var(--text3);
+      white-space: nowrap;
+      min-width: 36px;
+      text-align: right;
     }
 
     .card-icon {
@@ -300,13 +416,16 @@
     .icon-btn.del:hover { color: var(--red); border-color: var(--red); background: var(--red-soft); }
 
     .card-name {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .card-provider {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text3);
     }
 
@@ -345,9 +464,8 @@
 
     .reset-highlight {
       color: var(--accent) !important;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: -0.2px;
     }
 
 
@@ -508,7 +626,7 @@
       <div class="logo">
         <div class="logo-icon">🤖</div>
         <div>
-          <h1>AI 工具额度管理</h1>
+          <h1>雪糕</h1>
           <p>记录重置与订阅到期时间</p>
         </div>
       </div>
@@ -1006,8 +1124,8 @@
 
         return `
           <div class="card status-${s}">
-            <div class="card-header">
-              <div style="display:flex;align-items:center;gap:10px;flex:1">
+            <div class="card-top">
+              <div class="card-icon-wrap">
                 <div class="${iconClass}">${providerIcon
                   ? `<svg viewBox="0 0 24 24" fill="${providerIcon.color}" xmlns="http://www.w3.org/2000/svg"><path d="${providerIcon.path}"/></svg>`
                   : emoji}</div>
@@ -1016,29 +1134,29 @@
                   <div class="card-provider">${esc(t.provider || '—')}</div>
                 </div>
               </div>
-              <div class="card-actions">
-                <button class="icon-btn" onclick="editTool('${t.id}')" title="编辑">✏️</button>
-                <button class="icon-btn del" onclick="deleteTool('${t.id}')" title="删除">🗑️</button>
+              <div class="card-meta">
+                <div class="meta-row">
+                  <span class="status-dot status-${s}"></span>
+                  <span class="meta-label">额度重置</span>
+                  <span class="meta-value reset-highlight ${resetClass}">${fmtNextOccurrence(t.reset?.period, t.reset?.day, t.reset?.hour, t.reset?.minute)} · ${resetText}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="status-dot status-ok"></span>
+                  <span class="meta-label">到期</span>
+                  <span class="meta-value ${expiryClass}">${fmtNextOccurrence(t.expiry?.period, t.expiry?.day)}</span>
+                </div>
+                <div class="card-actions">
+                  <button class="icon-btn" onclick="editTool('${t.id}')" title="编辑">✏️</button>
+                  <button class="icon-btn del" onclick="deleteTool('${t.id}')" title="删除">🗑️</button>
+                </div>
               </div>
             </div>
-
-            <div class="card-dates">
-              <div class="date-row">
-                <span class="date-label">🔄 额度重置</span>
-                <span class="date-value reset-highlight ${resetClass}">${fmtNextOccurrence(t.reset?.period, t.reset?.day, t.reset?.hour, t.reset?.minute)} · ${resetText}</span>
-              </div>
-              <div class="date-row" style="flex:0 0 auto">
-                <span class="date-label">📅 到期</span>
-                <span class="date-value ${expiryClass}">${fmtNextOccurrence(t.expiry?.period, t.expiry?.day)}</span>
-              </div>
-            </div>
-
             ${t.quotaPct != null ? `
-            <div style="margin-top:8px;position:relative">
-              <div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;cursor:pointer" onclick="quickEditQuota('${t.id}')" title="点击快速调整额度百分比">
-                <div style="height:100%;width:${Math.max(Math.min(t.quotaPct, 100), 0.5)}%;background:${t.quotaPct > 80 ? 'var(--red)' : t.quotaPct > 50 ? 'var(--orange)' : 'var(--green)'};border-radius:2px;transition:width 0.3s;min-width:2px"></div>
+            <div class="quota-wrap">
+              <div class="quota-bar" onclick="quickEditQuota('${t.id}')" title="点击快速调整额度百分比">
+                <div class="quota-fill" style="width:${Math.max(Math.min(t.quotaPct, 100), 0.5)}%;background:${t.quotaPct > 80 ? 'var(--red)' : t.quotaPct > 50 ? 'var(--orange)' : 'var(--green)'}"></div>
               </div>
-              <div style="font-size:11px;color:var(--text3);margin-top:2px;text-align:right">${t.quotaPct.toFixed(1)}%</div>
+              <span class="quota-pct">${t.quotaPct.toFixed(1)}%</span>
             </div>` : ''}
           </div>`;
       }).join('');
