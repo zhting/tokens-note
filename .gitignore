@@ -1,0 +1,15 @@
+# 临时调试脚本/产物（非项目文件）
+_build.js
+_cur.html
+_diag2.js
+_e2e2.js
+_extract_cur.js
+_peek.js
+_peek2.js
+_peek3.js
+_peek4.js
+_peek5.js
+
+# Python
+__pycache__/
+*.pyc
