@@ -30,8 +30,11 @@ echo 使用端口: %FOUND_PORT%
 echo 启动本地服务器: %ROOT%
 echo.
 
-REM 启动本地服务器（支持读写 ai-tools-data.json，后台运行）
-start "" /min cmd /c "cd /d "%ROOT%" && python server.py %FOUND_PORT%"
+REM 切换到项目根目录（server.py 以此为工作目录）
+cd /d "%ROOT%"
+
+REM 启动本地服务器（支持读写 ai-tools-data.json，最小化后台窗口运行）
+start "" /min python server.py %FOUND_PORT%
 
 REM 等待服务器就绪
 ping -n 2 127.0.0.1 >nul

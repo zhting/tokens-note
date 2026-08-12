@@ -9,6 +9,11 @@ _peek2.js
 _peek3.js
 _peek4.js
 _peek5.js
+_diag_syntax.js
+_diag_line.js
+_diag_full.js
+_fix_obj.js
+_dcscript_*.txt
 
 # Python
 __pycache__/
