@@ -1,110 +1,92 @@
 [
   {
+    "id": "default1",
     "name": "ChatGPT Plus",
     "provider": "OpenAI",
     "category": "chat",
     "reset": {
       "period": "weekly",
-      "day": 1,
+      "day": 2,
       "hour": 0,
       "minute": 0
     },
     "expiry": {
       "period": "monthly",
-      "day": 7
+      "day": 11
     },
-    "quotaPct": 32.4,
-    "id": "default1",
-    "created": "2026-08-10T04:40:13.077Z"
+    "quotaPct": 32,
+    "created": "2026-08-12T10:20:24.892888+00:00"
   },
   {
+    "id": "default2",
     "name": "Claude Pro",
     "provider": "Anthropic",
     "category": "chat",
     "reset": {
       "period": "weekly",
-      "day": 4,
-      "hour": 9,
+      "day": 0,
+      "hour": 15,
       "minute": 0
     },
     "expiry": {
       "period": "monthly",
-      "day": 7
+      "day": 11
     },
-    "quotaPct": 61.2,
-    "id": "default2",
-    "created": "2026-08-10T04:40:13.078Z"
+    "quotaPct": 26,
+    "created": "2026-08-12T10:20:24.892888+00:00"
   },
   {
+    "id": "default3",
     "name": "Cursor",
     "provider": "Cursor",
     "category": "coding",
     "reset": {
       "period": "monthly",
-      "day": 12,
+      "day": 22,
       "hour": 0,
       "minute": 0
     },
     "expiry": {
       "period": "monthly",
-      "day": 12
+      "day": 22
     },
-    "quotaPct": 88.5,
-    "id": "default3",
-    "created": "2026-08-10T04:40:13.078Z"
+    "quotaPct": 36,
+    "created": "2026-08-12T10:20:24.892888+00:00"
   },
   {
+    "id": "default4",
     "name": "Grok",
     "provider": "xAI",
     "category": "chat",
     "reset": {
       "period": "weekly",
-      "day": 1,
+      "day": 5,
       "hour": 0,
       "minute": 0
     },
     "expiry": {
       "period": "monthly",
-      "day": 7
+      "day": 26
     },
-    "quotaPct": 17.8,
-    "id": "default4",
-    "created": "2026-08-10T04:40:13.078Z"
+    "quotaPct": 51,
+    "created": "2026-08-12T10:20:24.892888+00:00"
   },
   {
+    "id": "default5",
     "name": "Kimi",
     "provider": "Moonshot AI",
     "category": "chat",
     "reset": {
-      "period": "weekly",
-      "day": 6,
+      "period": "monthly",
+      "day": 18,
       "hour": 0,
       "minute": 0
     },
     "expiry": {
       "period": "monthly",
-      "day": 20
+      "day": 18
     },
-    "quotaPct": null,
-    "id": "default5",
-    "created": "2026-08-10T04:40:13.078Z"
-  },
-  {
-    "name": "Perplexity Pro",
-    "provider": "Perplexity",
-    "category": "search",
-    "reset": {
-      "period": "monthly",
-      "day": 3,
-      "hour": 0,
-      "minute": 0
-    },
-    "expiry": {
-      "period": "monthly",
-      "day": 3
-    },
-    "quotaPct": 44,
-    "id": "default6",
-    "created": "2026-08-10T04:40:13.078Z"
+    "quotaPct": 90,
+    "created": "2026-08-12T10:20:24.892888+00:00"
   }
 ]

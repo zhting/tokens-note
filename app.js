@@ -8,7 +8,9 @@ const BRANDS = [
   { keys: ['anthropic', 'claude'], color: '#d97757', path: 'm4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z' },
   { keys: ['xai', 'grok'], color: '#ffffff', path: 'M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z' },
   { keys: ['cursor'], color: '#ffffff', path: 'M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23' },
-  { keys: ['kimi', 'moonshot'], color: '#8b93ff', path: 'M21.765.351C22.998.351 24 1.353 24 2.586S22.998 4.82 21.765 4.82h-1.974c-.15 0-.26-.12-.26-.26V2.586A2.237 2.237 0 0 1 21.765.35M9.41 13.388l8.447-8.377c.16-.16.07-.471-.14-.471h-4.55s-.1.02-.14.06l-9.099 9.029c-.14.14-.35.02-.35-.21V4.81c0-.15-.1-.27-.221-.27H.22c-.12 0-.22.12-.22.27v18.57c0 .15.1.27.22.27h3.137c.12 0 .22-.12.22-.27v-3.79c0-.08.03-.16.08-.21l2.826-2.796c.07-.07.16-.08.241-.03l7.546 5.551a8.9 8.9 0 0 0 4.018 1.493c.12.01.23-.11.23-.27V19.76c0-.14-.08-.25-.19-.26a5.8 5.8 0 0 1-2.355-.942l-6.533-4.73c-.14-.09-.15-.32-.03-.441' },
+  { keys: ['kimi'], color: '#8b93ff', path: 'M13 1.5c4.69 0 8.5 3.81 8.5 8.5v4c0 4.69-3.81 8.5-8.5 8.5-1.66 0-3.22-.48-4.55-1.31l-7.16 3.41 3.42-7.06C3.58 16.18 3 14.4 3 12.5V10C3 5.31 6.81 1.5 13 1.5Zm-2 5.5v2h4v-2h-4Zm-3 4v2h10v-2H8Z' },
+  { keys: ['moonshot', '月之暗面'], color: '#ff5c1f', path: 'M12 2 4 18h5l3-6.5L15 18h5L12 2Zm-7 18 2 4h4l-2-4H5Z' },
+  { keys: ['agnes'], color: '#ff7a2e', path: 'M2 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0 2 4 0 8H2c-2-4-2-4 0-8Z' },
   { keys: ['perplexity'], color: '#20b8cd', path: 'M22.3977 7.0896h-2.3106V.0676l-7.5094 6.3542V.1577h-1.1554v6.1966L4.4904 0v7.0896H1.6023v10.3976h2.8882V24l6.932-6.3591v6.2005h1.1554v-6.0469l6.9318 6.1807v-6.4879h2.8882V7.0896zm-3.4657-4.531v4.531h-5.355l5.355-4.531zm-13.2862.0676 4.8691 4.4634H5.6458V2.6262zM2.7576 16.332V8.245h7.8476l-6.1149 6.1147v1.9723H2.7576zm2.8882 5.0404v-3.8852h.0001v-2.6488l5.7763-5.7764v7.0111l-5.7764 5.2993zm12.7086.0248-5.7766-5.1509V9.0618l5.7766 5.7766v6.5588zm2.8882-5.0652h-1.733v-1.9723L13.3948 8.245h7.8478v8.087z' },
   { keys: ['gemini', 'google'], color: '#4796e3', path: 'M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81' },
   { keys: ['deepseek'], color: '#4d6bfe', path: 'M23.748 4.651c-.254-.124-.364.113-.512.233-.051.04-.094.09-.137.137-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.155-.708-.311-.955-.65-.172-.24-.219-.509-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.094.172.187.129.323-.082.28-.18.553-.266.833-.055.179-.137.218-.328.14a5.5 5.5 0 0 1-1.737-1.179c-.857-.828-1.631-1.743-2.597-2.46a12 12 0 0 0-.689-.47c-.985-.957.13-1.743.387-1.836.27-.098.094-.433-.778-.428-.872.003-1.67.295-2.687.685a3 3 0 0 1-.465.136 9.6 9.6 0 0 0-2.883-.101c-1.885.21-3.39 1.1-4.497 2.622C.082 8.776-.231 10.854.152 13.02c.403 2.284 1.568 4.175 3.36 5.653 1.857 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.132-.284 4.994-1.86.47.234.962.328 1.78.398.629.058 1.235-.031 1.705-.129.735-.155.684-.836.418-.961-2.155-1.004-1.682-.595-2.112-.926 1.095-1.295 2.768-3.598 3.284-6.733.05-.346.115-.834.108-1.114-.004-.171.035-.238.23-.257a4.2 4.2 0 0 0 1.545-.475c1.397-.763 1.96-2.016 2.093-3.517.02-.23-.004-.467-.247-.588M11.58 18.168c-2.088-1.642-3.101-2.183-3.52-2.16-.39.024-.32.472-.234.763.09.288.207.487.371.74.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.168-1.361-.801-2.5-1.86-3.301-3.306-.775-1.393-1.225-2.888-1.299-4.482-.02-.385.094-.522.477-.592a4.7 4.7 0 0 1 1.53-.038c2.131.311 3.946 1.264 5.467 2.774.868.86 1.525 1.887 2.202 2.89.72 1.066 1.494 2.082 2.48 2.915.348.291.626.513.892.677-.802.09-2.14.109-3.055-.615zm1.001-6.44a.306.306 0 0 1 .415-.287.3.3 0 0 1 .113.074.3.3 0 0 1 .086.214c0 .17-.136.307-.308.307a.303.303 0 0 1-.306-.307m3.11 1.596c-.2.081-.4.151-.591.16a1.25 1.25 0 0 1-.798-.254c-.274-.23-.47-.358-.551-.758a1.7 1.7 0 0 1 .015-.588c.07-.327-.007-.537-.238-.727-.188-.156-.426-.199-.689-.199a.6.6 0 0 1-.254-.078.253.253 0 0 1-.114-.358 1 1 0 0 1 .192-.21c.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.392.451.462.576.685.915.176.264.336.536.446.848.066.194-.02.353-.25.45' },
@@ -18,19 +20,41 @@ const BRANDS = [
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
 const DEFAULTS = [
-  { name: 'ChatGPT Plus', provider: 'OpenAI', category: 'chat', reset: { period: 'weekly', day: 1, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 7 }, quotaPct: 32.4 },
-  { name: 'Claude Pro', provider: 'Anthropic', category: 'chat', reset: { period: 'weekly', day: 4, hour: 9, minute: 0 }, expiry: { period: 'monthly', day: 7 }, quotaPct: 61.2 },
-  { name: 'Cursor', provider: 'Cursor', category: 'coding', reset: { period: 'monthly', day: 12, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 12 }, quotaPct: 88.5 },
-  { name: 'Grok', provider: 'xAI', category: 'chat', reset: { period: 'weekly', day: 1, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 7 }, quotaPct: 17.8 },
-  { name: 'Kimi', provider: 'Moonshot AI', category: 'chat', reset: { period: 'weekly', day: 6, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 20 }, quotaPct: null },
-  { name: 'Perplexity Pro', provider: 'Perplexity', category: 'search', reset: { period: 'monthly', day: 3, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 3 }, quotaPct: 44.0 }
+  { name: 'ChatGPT Plus', provider: 'OpenAI', category: 'chat', reset: { period: 'weekly', day: 2, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 11 }, quotaPct: 32 },
+  { name: 'Claude Pro', provider: 'Anthropic', category: 'chat', reset: { period: 'weekly', day: 0, hour: 15, minute: 0 }, expiry: { period: 'monthly', day: 11 }, quotaPct: 26 },
+  { name: 'Cursor', provider: 'Cursor', category: 'coding', reset: { period: 'monthly', day: 22, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 22 }, quotaPct: 36 },
+  { name: 'Grok', provider: 'xAI', category: 'chat', reset: { period: 'weekly', day: 5, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 26 }, quotaPct: 51 },
+  { name: 'Kimi', provider: 'Moonshot AI', category: 'chat', reset: { period: 'monthly', day: 18, hour: 0, minute: 0 }, expiry: { period: 'monthly', day: 18 }, quotaPct: 90 }
 ];
 
 class Component extends DCLogic {
-  state = { tools: [], query: '', filter: 'all', modal: false, editId: null, form: this.blankForm(), toasts: [], tick: 0 };
+  // 模型选择网格（与 BRANDS 一一对应，最后一项为「自定义」）
+  BRAND_GRID: [
+    { id: 'openai',     label: 'ChatGPT',     provider: 'OpenAI',     color: '#10a37f', path: 'M22.282 9.821a5.985 5.985 0 0 0-.515-4.910 6.046 6.046 0 0 0-6.509-2.891 6.046 6.046 0 0 0-4.922 2.985m-.735 8.594a5.985 5.985 0 0 0 .515 4.910 6.046 6.046 0 0 0 6.509 2.891 6.046 6.046 0 0 0 4.922-2.985m-.735-8.594a5.985 5.985 0 0 1 .515-4.910 6.046 6.046 0 0 1 6.509-2.891 6.046 6.046 0 0 1 4.922 2.985M9.821 1.282a5.985 5.985 0 0 0-4.910.515 6.046 6.046 0 0 0-2.891 6.509 6.046 6.046 0 0 0 2.985 4.922' },
+    { id: 'anthropic',  label: 'Claude',      provider: 'Anthropic',  color: '#d97757', path: 'M18.18 13.42a4.46 4.46 0 0 1-4.45 4.46h-4.3a4.46 4.46 0 0 1-4.46-4.46V10.1A4.46 4.46 0 0 1 9.43 5.64h4.3a4.46 4.46 0 0 1 4.45 4.46v3.32Z' },
+    { id: 'cursor',     label: 'Cursor',      provider: 'Cursor',     color: '#ffffff', path: 'M4 2l7 20 2.5-8.5L22 11.5 4 2z' },
+    { id: 'gemini',     label: 'Gemini',      provider: 'Google',     color: '#4285f4', path: 'M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z' },
+    { id: 'perplexity', label: 'Perplexity',  provider: 'Perplexity', color: '#20808d', path: 'M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' },
+    { id: 'kimi',       label: 'Kimi',        provider: 'Moonshot AI', color: '#8b93ff', path: 'M13 1.5c4.69 0 8.5 3.81 8.5 8.5v4c0 4.69-3.81 8.5-8.5 8.5-1.66 0-3.22-.48-4.55-1.31l-7.16 3.41 3.42-7.06C3.58 16.18 3 14.4 3 12.5V10C3 5.31 6.81 1.5 13 1.5Zm-2 5.5v2h4v-2h-4Zm-3 4v2h10v-2H8Z' },
+    { id: 'moonshot',   label: 'Moonshot AI', provider: 'Moonshot AI', color: '#ff5c1f', path: 'M12 2 4 18h5l3-6.5L15 18h5L12 2Zm-7 18 2 4h4l-2-4H5Z' },
+    { id: 'deepseek',   label: 'DeepSeek',    provider: 'DeepSeek',   color: '#4d6bfe', path: 'M24 12a12 12 0 1 1-24 0 12 12 0 0 1 24 0Z' },
+    { id: 'xai',        label: 'Grok',        provider: 'xAI',         color: '#9b9b9b', path: 'M13.87 2.64c.4 2.46 2.46 4.52 4.92 4.92v5.08h-5.08c-.4-2.46-2.46-4.52-4.92-4.92V7.56c2.46.4 4.52 2.46 4.92 4.92h5.08v-.04l-4.99-4.8Z' },
+    { id: 'agnes',      label: 'Agnes',       provider: 'Agnes',      color: '#ff7a2e', path: 'M2 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0 2 4 0 8H2c-2-4-2-4 0-8Z' },
+    { id: '__custom__', label: '自定义',      provider: '' }
+  ],
+  state = { tools: [], query: '', filter: 'all', modal: false, editId: null, form: this.blankForm(), brand: '', toasts: [], tick: 0 };
 
   blankForm() {
     return { name: '', provider: '', category: 'chat', resetPeriod: 'weekly', resetDay: '1', resetTime: '00:00', expiryPeriod: 'monthly', expiryDay: '7', quotaPct: '' };
+  }
+
+  // 由当前 name+provider 反向识别所属 brand（用于「编辑」时高亮已选项）
+  detectBrand(form) {
+    const hay = ((form.provider || '') + ' ' + (form.name || '')).toLowerCase();
+    if (!hay.trim()) return '__custom__';
+    const def = this.BRAND_GRID.find(b => b.id !== '__custom__' && b.provider && hay.includes(b.provider.toLowerCase()));
+    if (def) return def.id;
+    return '__custom__';
   }
 
   componentDidMount() {
@@ -204,16 +228,34 @@ class Component extends DCLogic {
   }
 
   open(id) {
-    if (!id) return this.setState({ modal: true, editId: null, form: this.blankForm() });
+    if (!id) return this.setState({ modal: true, editId: null, form: this.blankForm(), brand: '__custom__' });
     const t = this.state.tools.find(x => x.id === id);
     if (!t) return;
-    this.setState({ modal: true, editId: id, form: {
+    const form = {
       name: t.name, provider: t.provider, category: t.category,
       resetPeriod: t.reset.period, resetDay: String(t.reset.day),
       resetTime: String(t.reset.hour).padStart(2, '0') + ':' + String(t.reset.minute).padStart(2, '0'),
       expiryPeriod: t.expiry.period, expiryDay: String(t.expiry.day),
       quotaPct: t.quotaPct != null ? String(t.quotaPct) : ''
-    } });
+    };
+    this.setState({ modal: true, editId: id, form, brand: this.detectBrand(form) });
+  }
+
+  pickBrand(id) {
+    const def = this.BRAND_GRID.find(b => b.id === id);
+    if (!def) return;
+    this.setState(s => {
+      const form = { ...s.form };
+      if (id === '__custom__') {
+        // 自定义：清空让用户填
+        form.name = '';
+        form.provider = '';
+      } else {
+        form.name = def.label;
+        form.provider = def.provider;
+      }
+      return { brand: id, form };
+    });
   }
 
   close() { this.setState({ modal: false }); }
@@ -332,6 +374,9 @@ class Component extends DCLogic {
       modalOpen: this.state.modal,
       modalTitle: this.state.editId ? '编辑工具' : '添加工具',
       form: this.state.form,
+      brandGrid: this.BRAND_GRID,
+      brandSelected: this.state.brand || '__custom__',
+      onPickBrand: id => this.pickBrand(id),
       resetDayOptions: this.dayOptions(this.state.form.resetPeriod),
       expiryDayOptions: this.dayOptions(this.state.form.expiryPeriod),
       onField: { name: this.field('name'), provider: this.field('provider'), category: this.field('category'), resetPeriod: this.field('resetPeriod'), resetDay: this.field('resetDay'), resetTime: this.field('resetTime'), expiryPeriod: this.field('expiryPeriod'), expiryDay: this.field('expiryDay'), quotaPct: this.field('quotaPct') },
