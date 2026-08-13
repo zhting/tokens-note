@@ -229,11 +229,12 @@ class WidgetApp:
         self.list_area.pack(fill="both", expand=True, padx=16)
         self._build_footer()
 
-        # 拖拽绑定到整个 header
+        # 顶部区域（header + hero + 上方空白）均可拖动
         self._dx = self._dy = 0
-        for w in (self.header, self.brand, self.title_lbl, self.stats):
-            w.bind("<ButtonPress-1>", self._start_drag)
-            w.bind("<B1-Motion>", self._on_drag)
+        self._dragging = False
+        self.DRAG_HEIGHT = 200
+        self.content.bind("<ButtonPress-1>", self._start_drag)
+        self.content.bind("<B1-Motion>", self._on_drag)
 
         self.menu = tk.Menu(self.root, tearoff=0,
                             bg=SURFACE, fg=TEXT, activebackground=SURFACE2,
@@ -280,11 +281,11 @@ class WidgetApp:
         self.menu_btn = tk.Label(self.topright, text="▼", bg=BG, fg=MUTED,
                                  font=("Segoe UI", 10), cursor="hand2", width=2)
         self.menu_btn.pack(side="right")
-        self.menu_btn.bind("<Button-1>", lambda e: self.menu.post(e.x_root, e.y_root))
+        self.menu_btn.bind("<Button-1>", lambda e: (self.menu.post(e.x_root, e.y_root), "break")[1])
 
         self.close_btn = tk.Label(self.topright, text="✕", bg=BG, fg=MUTED,
                                   font=("Segoe UI", 11), cursor="hand2", width=2)
-        self.close_btn.bind("<Button-1>", lambda e: self.root.destroy())
+        self.close_btn.bind("<Button-1>", lambda e: (self.root.destroy(), "break")[1])
         # 默认隐藏，鼠标移入窗口后显示
         # self.close_btn.pack(side="right")
 
@@ -456,10 +457,18 @@ class WidgetApp:
             self.close_btn.pack_forget()
 
     def _start_drag(self, e):
+        # 只在窗口顶部区域（含 header、hero 和上方空白）触发拖动
+        # 子组件事件会先触发；菜单/关闭按钮已返回 break，不会进入这里
+        if e.y > self.DRAG_HEIGHT:
+            self._dragging = False
+            return
+        self._dragging = True
         self._dx = e.x_root - self.root.winfo_x()
         self._dy = e.y_root - self.root.winfo_y()
 
     def _on_drag(self, e):
+        if not self._dragging:
+            return
         x = e.x_root - self._dx
         y = e.y_root - self._dy
         x, y = self._snap_coords(x, y)
