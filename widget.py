@@ -245,6 +245,12 @@ class WidgetApp:
         self.menu.add_separator()
         self.menu.add_command(label="✕ 退出", command=self.root.destroy)
 
+        # 鼠标移入窗口显示关闭按钮，移出隐藏
+        self.root.bind("<Enter>", lambda e: self._show_close())
+        self.root.bind("<Leave>", lambda e: self._hide_close())
+        # 拖拽释放后吸附到就近边缘
+        self.root.bind("<ButtonRelease-1>", lambda e: self._snap())
+
         self.refresh()
         self.root.after(60000, self._tick)
 
@@ -265,12 +271,22 @@ class WidgetApp:
 
         self.stats = tk.Label(self.header, text="", bg=BG, fg=MUTED,
                               font=("Segoe UI", 10))
-        self.stats.pack(side="left", fill="x", expand=True, padx=(8, 0), anchor="w")
+        self.stats.pack(side="left", anchor="w", padx=(8, 0))
 
-        self.menu_btn = tk.Label(self.header, text="▼", bg=BG, fg=MUTED,
+        # 右上角控制区：菜单 + 关闭；关闭按钮默认隐藏，hover 时显示
+        self.topright = tk.Frame(self.content, bg=BG)
+        self.topright.place(relx=1.0, x=-6, y=14, anchor="ne")
+
+        self.menu_btn = tk.Label(self.topright, text="▼", bg=BG, fg=MUTED,
                                  font=("Segoe UI", 10), cursor="hand2", width=2)
         self.menu_btn.pack(side="right")
         self.menu_btn.bind("<Button-1>", lambda e: self.menu.post(e.x_root, e.y_root))
+
+        self.close_btn = tk.Label(self.topright, text="✕", bg=BG, fg=MUTED,
+                                  font=("Segoe UI", 11), cursor="hand2", width=2)
+        self.close_btn.bind("<Button-1>", lambda e: self.root.destroy())
+        # 默认隐藏，鼠标移入窗口后显示
+        # self.close_btn.pack(side="right")
 
     # ---- 底部 ----
     def _build_footer(self):
@@ -408,12 +424,46 @@ class WidgetApp:
                  bg=BG, fg=MUTED, font=("Segoe UI", 12)).pack(pady=40)
 
     # ---- 交互 ----
+    def _snap_coords(self, x, y):
+        """把窗口坐标吸附到就近的屏幕边缘（距离 SNAP 像素内则贴边）。"""
+        try:
+            sw = self.root.winfo_screenwidth()
+            sh = self.root.winfo_screenheight()
+        except Exception:
+            return x, y
+        SNAP = 18
+        if abs(x) <= SNAP:
+            x = 0
+        elif abs(x + self.W - sw) <= SNAP:
+            x = sw - self.W
+        if abs(y) <= SNAP:
+            y = 0
+        elif abs(y + self.H - sh) <= SNAP:
+            y = sh - self.H
+        return x, y
+
+    def _snap(self):
+        self.root.geometry(f"+{self.root.winfo_x()}+{self.root.winfo_y()}")
+        x, y = self._snap_coords(self.root.winfo_x(), self.root.winfo_y())
+        self.root.geometry(f"+{x}+{y}")
+
+    def _show_close(self):
+        if not self.close_btn.winfo_ismapped():
+            self.close_btn.pack(side="right")
+
+    def _hide_close(self):
+        if self.close_btn.winfo_ismapped():
+            self.close_btn.pack_forget()
+
     def _start_drag(self, e):
         self._dx = e.x_root - self.root.winfo_x()
         self._dy = e.y_root - self.root.winfo_y()
 
     def _on_drag(self, e):
-        self.root.geometry(f"+{e.x_root - self._dx}+{e.y_root - self._dy}")
+        x = e.x_root - self._dx
+        y = e.y_root - self._dy
+        x, y = self._snap_coords(x, y)
+        self.root.geometry(f"+{x}+{y}")
 
     def toggle_top(self):
         cur = self.root.attributes("-topmost")
