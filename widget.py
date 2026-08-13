@@ -34,7 +34,7 @@ ACCENT = "#8b7cf6"
 TEAL = "#45d2c6"
 ORANGE = "#f5a524"
 RED = "#f87171"
-HERO_BG = "#16131f"
+HERO_BG = "#161922"
 TRACK = "#20232e"
 
 WEEKDAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
@@ -158,6 +158,8 @@ class WidgetApp:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("雪糕 · 桌面小窗")
+        # 去掉系统标题栏和边框，做成无边框圆角小窗
+        self.root.overrideredirect(True)
         self.root.attributes("-topmost", True)
         # 用纯黑作为透明色，实现圆角窗口
         self.root.attributes("-transparentcolor", "#000000")
@@ -228,29 +230,36 @@ class WidgetApp:
     # ---- 头部 ----
     def _build_header(self):
         self.header = tk.Frame(self.content, bg=BG)
-        self.header.pack(fill="x", padx=16, pady=(16, 0))
+        self.header.pack(fill="x", padx=16, pady=(12, 0))
 
         self.brand = tk.Frame(self.header, bg=BG)
         self.brand.pack(side="left")
         if self.logo_img:
-            lbl = tk.Label(self.brand, image=self.logo_img, bg=BG, width=40, height=40)
+            lbl = tk.Label(self.brand, image=self.logo_img, bg=BG, width=32, height=32)
             lbl.pack(side="left")
         else:
             fallback = tk.Label(self.brand, text="🍦", bg=BG, fg=TEXT,
-                                font=("Segoe UI", 22))
+                                font=("Segoe UI", 20))
             fallback.pack(side="left")
         title = tk.Label(self.brand, text="雪糕", bg=BG, fg=TEXT,
-                         font=("Segoe UI", 16, "bold"))
-        title.pack(side="left", padx=(6, 0))
+                         font=("Segoe UI", 15, "bold"))
+        title.pack(side="left", padx=(4, 0))
 
         self.stats = tk.Label(self.header, text="", bg=BG, fg=MUTED,
                               font=("Segoe UI", 10))
         self.stats.pack(side="left", fill="x", expand=True, padx=(8, 0), anchor="w")
 
-        self.menu_btn = tk.Label(self.header, text="≡", bg=BG, fg=MUTED,
-                                 font=("Segoe UI", 16), cursor="hand2")
+        btns = tk.Frame(self.header, bg=BG)
+        btns.pack(side="right")
+        self.menu_btn = tk.Label(btns, text="≡", bg=BG, fg=MUTED,
+                                 font=("Segoe UI", 14), cursor="hand2", width=2)
         self.menu_btn.pack(side="right")
         self.menu_btn.bind("<Button-1>", lambda e: self.menu.post(e.x_root, e.y_root))
+
+        close = tk.Label(btns, text="✕", bg=BG, fg=MUTED,
+                         font=("Segoe UI", 12), cursor="hand2", width=2)
+        close.pack(side="right")
+        close.bind("<Button-1>", lambda e: self.root.destroy())
 
     # ---- 底部 ----
     def _build_footer(self):
