@@ -190,7 +190,11 @@ class WidgetApp:
         self.logo_img = None
         if os.path.exists(LOGO_FILE):
             try:
-                self.logo_img = tk.PhotoImage(file=LOGO_FILE).subsample(2, 2)  # 原图较大，缩小
+                raw = tk.PhotoImage(file=LOGO_FILE)
+                # 动态缩放至约 40px（subsample 参数为正整数）
+                target = 40
+                factor = max(1, int(min(raw.width(), raw.height()) / target))
+                self.logo_img = raw.subsample(factor, factor)
             except Exception:
                 self.logo_img = None
 
@@ -229,8 +233,12 @@ class WidgetApp:
         self.brand = tk.Frame(self.header, bg=BG)
         self.brand.pack(side="left")
         if self.logo_img:
-            lbl = tk.Label(self.brand, image=self.logo_img, bg=BG)
+            lbl = tk.Label(self.brand, image=self.logo_img, bg=BG, width=40, height=40)
             lbl.pack(side="left")
+        else:
+            fallback = tk.Label(self.brand, text="🍦", bg=BG, fg=TEXT,
+                                font=("Segoe UI", 22))
+            fallback.pack(side="left")
         title = tk.Label(self.brand, text="雪糕", bg=BG, fg=TEXT,
                          font=("Segoe UI", 16, "bold"))
         title.pack(side="left", padx=(6, 0))
@@ -296,9 +304,10 @@ class WidgetApp:
         tk.Label(self.hero, text="下一次重置", bg=HERO_BG, fg=MUTED,
                  font=("Segoe UI", 11)).pack(anchor="w")
         count = tk.Label(self.hero, bg=HERO_BG, fg=ACCENT,
-                         font=("Segoe UI", 40, "bold"))
-        count.pack(anchor="w", pady=(0, 8))
-        count.config(text=f"{v['resetDays']}天{v['resetHours']}时后重置")
+                         font=("Segoe UI", 30, "bold"), anchor="w", justify="left")
+        count.pack(anchor="w", pady=(0, 8), fill="x")
+        count.config(text=f"{v['resetDays']}天{v['resetHours']}时后重置",
+                     wraplength=self.W - 2 * self.R - 32)
 
         row = tk.Frame(self.hero, bg=HERO_BG)
         row.pack(fill="x")
