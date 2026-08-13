@@ -229,12 +229,12 @@ class WidgetApp:
         self.list_area.pack(fill="both", expand=True, padx=16)
         self._build_footer()
 
-        # 顶部区域（header + hero + 上方空白）均可拖动
+        # 整个内容区（含顶部空白、hero、列表）均可拖动
         self._dx = self._dy = 0
         self._dragging = False
-        self.DRAG_HEIGHT = 200
-        self.content.bind("<ButtonPress-1>", self._start_drag)
-        self.content.bind("<B1-Motion>", self._on_drag)
+        for w in (self.content, self.canvas, self.root):
+            w.bind("<ButtonPress-1>", self._start_drag)
+            w.bind("<B1-Motion>", self._on_drag)
 
         self.menu = tk.Menu(self.root, tearoff=0,
                             bg=SURFACE, fg=TEXT, activebackground=SURFACE2,
@@ -300,7 +300,7 @@ class WidgetApp:
         link = tk.Label(footer, text="打开完整视图 ↗", bg=BG, fg=ACCENT,
                         font=("Segoe UI", 10), cursor="hand2")
         link.pack(side="right")
-        link.bind("<Button-1>", lambda e: self.open_full_view())
+        link.bind("<Button-1>", lambda e: (self.open_full_view(), "break")[1])
 
     # ---- 品牌徽标（回退） ----
     def _badge(self, parent, letter, color, size=22):
@@ -457,11 +457,8 @@ class WidgetApp:
             self.close_btn.pack_forget()
 
     def _start_drag(self, e):
-        # 只在窗口顶部区域（含 header、hero 和上方空白）触发拖动
-        # 子组件事件会先触发；菜单/关闭按钮已返回 break，不会进入这里
-        if e.y > self.DRAG_HEIGHT:
-            self._dragging = False
-            return
+        # 整个窗口（任意不透明区域）按住即可拖动
+        # 菜单/关闭/链接已返回 "break"，不会进入这里
         self._dragging = True
         self._dx = e.x_root - self.root.winfo_x()
         self._dy = e.y_root - self.root.winfo_y()
