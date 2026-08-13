@@ -259,13 +259,31 @@ function del(id) {
 
 function setQuota(id) {
   const v0 = state.tools.find(x => x.id === id);
+  if (v0 && v0.quotaLive) return refreshQuota();
   const cur = v0 && v0.quotaPct != null ? v0.quotaPct : '';
-  const input = prompt('已用额度百分比 (0–100)', cur);
+  const input = prompt('已用额度百分比 (0–100)，实时账号请点右上角 ↻', cur);
   if (input === null) return;
   const val = input.trim() === '' ? null : parseFloat(input);
   if (val !== null && (isNaN(val) || val < 0 || val > 100)) return toast('⚠ 请输入 0–100');
-  update(state.tools.map(x => x.id === id ? { ...x, quotaPct: val } : x));
+  update(state.tools.map(x => x.id === id ? { ...x, quotaPct: val, quotaLive: false } : x));
   toast('✓ 额度已更新');
+}
+
+async function refreshQuota() {
+  toast('正在拉取实时额度…');
+  try {
+    const r = await fetch('/api/refresh-quota', { method: 'POST' });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || '刷新失败');
+    state.tools = data.tools || state.tools;
+    try { localStorage.setItem(KEY, JSON.stringify(state.tools)); } catch (e) {}
+    renderDynamic();
+    const ok = (data.results || []).filter(x => x.ok).length;
+    const fail = (data.results || []).filter(x => !x.ok).length;
+    toast(fail ? `✓ 实时 ${ok} 个，失败 ${fail} 个` : `✓ 已实时更新 ${ok} 个`);
+  } catch (e) {
+    toast('⚠ 实时拉取失败：' + (e.message || e));
+  }
 }
 
 function resetDefaults() {
@@ -349,6 +367,7 @@ function renderShell() {
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
+          <button class="icon-btn" data-act="refreshquota" title="实时拉取额度">↻</button>
           <button class="icon-btn" data-act="saveall" title="保存">💾</button>
           <button class="primary-btn" data-act="add" style="margin-left:4px;">＋ 添加工具</button>
         </div>
@@ -447,17 +466,20 @@ function renderList() {
       : v.hasIcon
       ? `<svg viewBox="0 0 24 24" width="20" height="20" fill="${v.markColor}" xmlns="http://www.w3.org/2000/svg"><path d="${v.iconPath}"></path></svg>`
       : `<span class="mono" style="font-size:15px; font-weight:700; color:${v.markColor};">${esc(v.mark)}</span>`;
+    const liveTag = t.quotaLive
+      ? `<span class="mono" style="font-size:10px; letter-spacing:0.08em; color:#45d2c6; margin-left:6px;">LIVE</span>`
+      : (t.quotaError ? `<span class="mono" style="font-size:10px; color:#f5a524; margin-left:6px;" title="${esc(t.quotaError)}">手工</span>` : '');
     const quotaBlock = v.t.quotaPct != null
-      ? `<div data-act="quota:${t.id}" title="点击调整已用额度" style="cursor:pointer;">
+      ? `<div data-act="quota:${t.id}" title="${t.quotaLive ? (t.quotaDetail || '实时额度，点击刷新') : '点击手动填写额度'}" style="cursor:pointer;">
            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;">
-             <span class="mono" style="font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:#6a7085;">已用</span>
+             <span class="mono" style="font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:#6a7085;">已用${liveTag}</span>
              <span class="mono" style="font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; color:${v.quotaColor};">${esc(v.t.quotaPct.toFixed(1))}%</span>
            </div>
            <div style="height:5px; border-radius:3px; background:#22252f; overflow:hidden;">
              <div style="height:100%; border-radius:3px; transition:width .4s ease; width:${Math.max(Math.min(v.t.quotaPct||0,100),1.5)}%; background:${v.quotaColor};"></div>
            </div>
          </div>`
-      : `<div data-act="quota:${t.id}" style="cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:12px; color:#3d4152;" onmouseover="this.style.color='#9296a6'" onmouseout="this.style.color='#3d4152'">＋ 记录额度</div>`;
+      : `<div data-act="refreshquota" style="cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:12px; color:#3d4152;" onmouseover="this.style.color='#9296a6'" onmouseout="this.style.color='#3d4152'">↻ 拉取实时额度</div>`;
     return `
     <div class="row">
       <div style="position:absolute; left:0; top:0; bottom:0; width:3px; background:${v.statusColor};"></div>
@@ -586,6 +608,7 @@ app.addEventListener('click', e => {
   if (act === 'close') return close();
   if (act === 'save') return save();
   if (act === 'saveall') return persist(state.tools);
+  if (act === 'refreshquota') return refreshQuota();
   if (act === 'reset') return resetDefaults();
   if (act === 'export') return doExport();
   if (act === 'import') { fileInput.click(); return; }
@@ -616,7 +639,7 @@ document.addEventListener('keydown', e => {
 
 /* ---------------- 启动 ---------------- */
 renderShell();
-loadData().then(tools => { state.tools = tools; renderDynamic(); });
+loadData().then(tools => { state.tools = tools; renderDynamic(); refreshQuota(); });
 setInterval(() => { state.tick++; renderDynamic(); }, 30000);
 </script>
 </body>

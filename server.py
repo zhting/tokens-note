@@ -15,9 +15,49 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         length = int(self.headers.get('Content-Length', 0))
         return self.rfile.read(length) if length else b''
 
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+
     def do_POST(self):
+        path = self.path.split('?')[0].rstrip('/')
+        if path == '/api/refresh-quota':
+            try:
+                from quota_fetch import refresh_data_file
+                tools, results = refresh_data_file()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                body = json.dumps({
+                    'ok': True,
+                    'tools': tools,
+                    'results': [
+                        {
+                            'id': r.get('id'),
+                            'name': r.get('name'),
+                            'ok': r.get('ok'),
+                            'quotaPct': r.get('quotaPct'),
+                            'source': r.get('source'),
+                            'detail': r.get('detail'),
+                            'error': r.get('error'),
+                        } for r in results
+                    ],
+                }, ensure_ascii=False)
+                self.wfile.write(body.encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps({'ok': False, 'error': str(e)}).encode('utf-8'))
+            return
+
         # 仅支持保存固定数据文件
-        if self.path.split('?')[0].rstrip('/') in ('/ai-tools-data.json', '/api/save'):
+        if path in ('/ai-tools-data.json', '/api/save'):
             body = self._read_body()
             try:
                 # 校验为合法 JSON 数组

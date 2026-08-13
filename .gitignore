@@ -1,21 +1,25 @@
-# 临时调试脚本/产物（非项目文件）
+# 密钥与本地登录（切勿提交）
+quota-secrets.json
+
+# 参考仓库 / 调试产物
+_codexbar_ref/
 _back/
-_server2.log
 _icons/
-*.log
+.workbuddy/
 
 # Python
 __pycache__/
 *.pyc
 
-# 自动生成的构建产物（如有）
+# 日志与临时文件
+*.log
+_*.log
+_*.png
 _*.js
 _*.py
 _*.txt
 
-# 备份/临时文件
+# 备份 / 生成物
 ai-tools-data.bak.json
 index.bundle.html
-
-# WorkBuddy 内部笔记（非项目文件）
-.workbuddy/
+clipboard-*.png

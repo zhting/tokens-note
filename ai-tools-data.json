@@ -1,5 +1,26 @@
 [
   {
+    "id": "msqvfbpl7s2w0",
+    "name": "Agnes",
+    "provider": "Agnes",
+    "category": "chat",
+    "reset": {
+      "period": "weekly",
+      "day": 1,
+      "hour": 0,
+      "minute": 0
+    },
+    "expiry": {
+      "period": "monthly",
+      "day": 3
+    },
+    "quotaPct": 11,
+    "created": "2026-08-13T02:00:19.209Z",
+    "quotaLive": false,
+    "quotaError": "暂不支持自动拉取",
+    "quotaFetchedAt": "2026-08-13T10:27:47Z"
+  },
+  {
     "id": "default1",
     "name": "ChatGPT Plus",
     "provider": "OpenAI",
@@ -14,8 +35,11 @@
       "period": "monthly",
       "day": 11
     },
-    "quotaPct": 32,
-    "created": "2026-08-12T10:20:24.892888+00:00"
+    "quotaPct": 93,
+    "created": "2026-08-12T10:20:24.892888+00:00",
+    "quotaLive": false,
+    "quotaError": "Codex 登录已过期，请重新运行 codex login",
+    "quotaFetchedAt": "2026-08-13T10:27:47Z"
   },
   {
     "id": "default2",
@@ -32,8 +56,11 @@
       "period": "monthly",
       "day": 11
     },
-    "quotaPct": 26,
-    "created": "2026-08-12T10:20:24.892888+00:00"
+    "quotaPct": 30,
+    "created": "2026-08-12T10:20:24.892888+00:00",
+    "quotaLive": false,
+    "quotaError": "Claude 凭证为空或已失效，请重新 claude login",
+    "quotaFetchedAt": "2026-08-13T10:27:47Z"
   },
   {
     "id": "default3",
@@ -51,7 +78,10 @@
       "day": 22
     },
     "quotaPct": 36,
-    "created": "2026-08-12T10:20:24.892888+00:00"
+    "created": "2026-08-12T10:20:24.892888+00:00",
+    "quotaLive": false,
+    "quotaError": "未找到 Cursor 登录。把 Cookie 写到 quota-secrets.json 的 cursor_cookie，或安装并登录 Cursor",
+    "quotaFetchedAt": "2026-08-13T10:27:47Z"
   },
   {
     "id": "default4",
@@ -68,8 +98,14 @@
       "period": "monthly",
       "day": 26
     },
-    "quotaPct": 51,
-    "created": "2026-08-12T10:20:24.892888+00:00"
+    "quotaPct": 36.0,
+    "created": "2026-08-12T10:20:24.892888+00:00",
+    "quotaLive": true,
+    "quotaSource": "grok-billing",
+    "quotaDetail": "Grok 额度 36.0%",
+    "quotaFetchedAt": "2026-08-13T10:27:47Z",
+    "quotaError": null,
+    "quotaResetAt": 1786687997
   },
   {
     "id": "default5",
@@ -86,7 +122,10 @@
       "period": "monthly",
       "day": 18
     },
-    "quotaPct": 90,
-    "created": "2026-08-12T10:20:24.892888+00:00"
+    "quotaPct": 92,
+    "created": "2026-08-12T10:20:24.892888+00:00",
+    "quotaLive": false,
+    "quotaError": "Kimi 凭证无效，请重新登录 Kimi Code CLI 或填写 API key",
+    "quotaFetchedAt": "2026-08-13T10:27:47Z"
   }
 ]
