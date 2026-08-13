@@ -21,6 +21,7 @@ except Exception:
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(HERE, "ai-tools-data.json")
 LOGO_FILE = os.path.join(HERE, "logo.png")
+ASSETS_DIR = os.path.join(HERE, "assets")
 SERVER_PORT = 8099
 
 # ---------- 主题 ----------
@@ -46,9 +47,16 @@ BRAND_RULES = [
     (["kimi", "moonshot"], "#8b93ff"),
     (["perplexity"], "#20c997"),
 ]
+ICON_MAP = [
+    (["kimi", "moonshot"], "kimi"),
+    (["chatgpt", "openai", "gpt"], "openai"),
+    (["claude", "anthropic"], "claude"),
+    (["grok", "xai"], "xai"),
+    (["cursor"], "cursor"),
+]
 
 
-# ---------- 纯逻辑（与 widget.html 对齐） ----------
+# ---------- 纯逻辑 ----------
 def next_date(cfg, now):
     """根据 reset/expiry 配置，返回下一次发生的 UTC 时间。"""
     d = now.replace(minute=0, second=0, microsecond=0)
@@ -58,7 +66,6 @@ def next_date(cfg, now):
     minute = (cfg or {}).get("minute", 0)
 
     if period == "weekly":
-        # JS getUTCDay(): 周日=0..周六=6
         jdow = (d.weekday() + 1) % 7
         target = d.replace(hour=hour, minute=minute)
         diff = (day - jdow + 7) % 7
@@ -73,10 +80,8 @@ def next_date(cfg, now):
             target = target + timedelta(days=1)
         return target
 
-    # monthly
     target = datetime(now.year, now.month, day, hour, minute, tzinfo=timezone.utc)
     if target <= now:
-        # 加一个月（处理月末溢出）
         y, m = target.year, target.month + 1
         if m > 12:
             y, m = y + 1, 1
@@ -92,7 +97,6 @@ def rel(ms):
 
 
 def fmt(d):
-    # 转成"周日=0"索引以匹配 WEEKDAYS
     return f"{d.month}/{d.day} {WEEKDAYS[(d.weekday() + 1) % 7]}"
 
 
@@ -154,47 +158,65 @@ def round_rect(canvas, x, y, w, h, r, **kw):
     canvas.create_rectangle(x, y + r, x + w, y + h - r, **kw)
 
 
+def load_brand_icon(name, target_size=22):
+    """加载品牌 PNG 图标；失败返回 None。"""
+    n = (name or "").lower()
+    key = None
+    for keys, k in ICON_MAP:
+        if any(kk in n for kk in keys):
+            key = k
+            break
+    if not key:
+        return None
+    path = os.path.join(ASSETS_DIR, f"{key}.png")
+    if not os.path.exists(path):
+        return None
+    try:
+        raw = tk.PhotoImage(file=path)
+        factor = max(1, int(min(raw.width(), raw.height()) / target_size))
+        return raw.subsample(factor, factor)
+    except Exception:
+        return None
+
+
 class WidgetApp:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("雪糕 · 桌面小窗")
-        # 去掉系统标题栏和边框，做成无边框圆角小窗
         self.root.overrideredirect(True)
         self.root.attributes("-topmost", True)
-        # 用纯黑作为透明色，实现圆角窗口
         self.root.attributes("-transparentcolor", "#000000")
         self.root.configure(bg="#000000")
         self.root.resizable(False, False)
 
         self.W, self.H = 380, 660
         self.R = 22
-        # 默认放在主屏右上角
         try:
             sw = self.root.winfo_screenwidth()
-            sh = self.root.winfo_screenheight()
             x = sw - self.W - 24
             y = 24
         except Exception:
             x, y = 200, 200
         self.root.geometry(f"{self.W}x{self.H}+{x}+{y}")
 
-        # 圆角背景画布
         self.canvas = tk.Canvas(self.root, width=self.W, height=self.H,
                                 bg="#000000", highlightthickness=0, bd=0)
         self.canvas.pack(fill="both", expand=True)
         round_rect(self.canvas, 1, 1, self.W - 2, self.H - 2, self.R,
                    fill=BG, outline=BG)
 
-        # 内容层（置于圆角内部）
         self.content = tk.Frame(self.canvas, bg=BG)
-        self.content.place(x=self.R, y=self.R, width=self.W - 2 * self.R, height=self.H - 2 * self.R)
+        self.content.place(x=self.R, y=self.R,
+                           width=self.W - 2 * self.R, height=self.H - 2 * self.R)
+
+        # 缓存图标，避免被 GC
+        self.icons = {}
 
         self.logo_img = None
         if os.path.exists(LOGO_FILE):
             try:
                 raw = tk.PhotoImage(file=LOGO_FILE)
-                # 动态缩放至约 40px（subsample 参数为正整数）
-                target = 40
+                target = 32
                 factor = max(1, int(min(raw.width(), raw.height()) / target))
                 self.logo_img = raw.subsample(factor, factor)
             except Exception:
@@ -207,12 +229,11 @@ class WidgetApp:
         self.list_area.pack(fill="both", expand=True, padx=16)
         self._build_footer()
 
-        # 拖拽
+        # 拖拽绑定到整个 header
         self._dx = self._dy = 0
-        self.header.bind("<ButtonPress-1>", self._start_drag)
-        self.header.bind("<B1-Motion>", self._on_drag)
-        self.brand.bind("<ButtonPress-1>", self._start_drag)
-        self.brand.bind("<B1-Motion>", self._on_drag)
+        for w in (self.header, self.brand, self.title_lbl, self.stats):
+            w.bind("<ButtonPress-1>", self._start_drag)
+            w.bind("<B1-Motion>", self._on_drag)
 
         self.menu = tk.Menu(self.root, tearoff=0,
                             bg=SURFACE, fg=TEXT, activebackground=SURFACE2,
@@ -235,45 +256,36 @@ class WidgetApp:
         self.brand = tk.Frame(self.header, bg=BG)
         self.brand.pack(side="left")
         if self.logo_img:
-            lbl = tk.Label(self.brand, image=self.logo_img, bg=BG, width=32, height=32)
-            lbl.pack(side="left")
+            tk.Label(self.brand, image=self.logo_img, bg=BG, width=32, height=32).pack(side="left")
         else:
-            fallback = tk.Label(self.brand, text="🍦", bg=BG, fg=TEXT,
-                                font=("Segoe UI", 20))
-            fallback.pack(side="left")
-        title = tk.Label(self.brand, text="雪糕", bg=BG, fg=TEXT,
-                         font=("Segoe UI", 15, "bold"))
-        title.pack(side="left", padx=(4, 0))
+            tk.Label(self.brand, text="🍦", bg=BG, fg=TEXT, font=("Segoe UI", 20)).pack(side="left")
+        self.title_lbl = tk.Label(self.brand, text="雪糕", bg=BG, fg=TEXT,
+                                  font=("Segoe UI", 15, "bold"))
+        self.title_lbl.pack(side="left", padx=(4, 0))
 
         self.stats = tk.Label(self.header, text="", bg=BG, fg=MUTED,
                               font=("Segoe UI", 10))
         self.stats.pack(side="left", fill="x", expand=True, padx=(8, 0), anchor="w")
 
-        btns = tk.Frame(self.header, bg=BG)
-        btns.pack(side="right")
-        self.menu_btn = tk.Label(btns, text="≡", bg=BG, fg=MUTED,
-                                 font=("Segoe UI", 14), cursor="hand2", width=2)
+        self.menu_btn = tk.Label(self.header, text="▼", bg=BG, fg=MUTED,
+                                 font=("Segoe UI", 10), cursor="hand2", width=2)
         self.menu_btn.pack(side="right")
         self.menu_btn.bind("<Button-1>", lambda e: self.menu.post(e.x_root, e.y_root))
-
-        close = tk.Label(btns, text="✕", bg=BG, fg=MUTED,
-                         font=("Segoe UI", 12), cursor="hand2", width=2)
-        close.pack(side="right")
-        close.bind("<Button-1>", lambda e: self.root.destroy())
 
     # ---- 底部 ----
     def _build_footer(self):
         footer = tk.Frame(self.content, bg=BG)
         footer.pack(fill="x", padx=16, pady=(8, 14))
+        tk.Label(footer, text="●", bg=BG, fg=ORANGE, font=("Segoe UI", 8)).pack(side="left")
         self.update_lbl = tk.Label(footer, text="", bg=BG, fg=MUTED,
                                    font=("Segoe UI", 10))
-        self.update_lbl.pack(side="left")
+        self.update_lbl.pack(side="left", padx=(4, 0))
         link = tk.Label(footer, text="打开完整视图 ↗", bg=BG, fg=ACCENT,
                         font=("Segoe UI", 10), cursor="hand2")
         link.pack(side="right")
         link.bind("<Button-1>", lambda e: self.open_full_view())
 
-    # ---- 品牌徽标 ----
+    # ---- 品牌徽标（回退） ----
     def _badge(self, parent, letter, color, size=22):
         f = tk.Frame(parent, bg=parent["bg"], width=size, height=size)
         cv = tk.Canvas(f, width=size, height=size, bg=parent["bg"],
@@ -284,6 +296,18 @@ class WidgetApp:
         cv.create_text(size / 2, size / 2 + 1, text=letter, fill="#ffffff",
                        font=("Segoe UI", 11, "bold"))
         return f
+
+    def _brand_widget(self, parent, name, color, size=22):
+        """优先显示品牌 PNG 图标，失败回退字母徽章。"""
+        icon = self.icons.get(name)
+        if icon is None and name not in self.icons:
+            icon = load_brand_icon(name, size)
+            self.icons[name] = icon
+        if icon:
+            lbl = tk.Label(parent, image=icon, bg=parent["bg"], width=size, height=size)
+            lbl.pack(side="left")
+            return lbl
+        return self._badge(parent, name[0:1].upper(), color, size)
 
     # ---- 渲染动态内容 ----
     def refresh(self):
@@ -298,11 +322,11 @@ class WidgetApp:
 
         self.stats.config(text=f"{total} 个订阅 · {expiring_soon} 个将到期 · {resetting_soon} 个快重置")
 
-        hero = sorted(views, key=lambda v: v["resetDays"] * 24 + v["resetHours"])[0]
+        # 按重置时间排序：hero 和列表都基于 reset
+        views = sorted(views, key=lambda v: v["resetDays"] * 24 + v["resetHours"])
+        hero = views[0]
         self._render_hero(hero)
-
-        items = sorted(views, key=lambda v: v["expiryDays"] * 24 + v["expiryHours"])[:6]
-        self._render_list(items)
+        self._render_list(views[:6])
 
         now = datetime.now()
         self.update_lbl.config(text=f"更新于 {now.strftime('%H:%M')}")
@@ -312,18 +336,20 @@ class WidgetApp:
             w.destroy()
         tk.Label(self.hero, text="下一次重置", bg=HERO_BG, fg=MUTED,
                  font=("Segoe UI", 11)).pack(anchor="w")
-        count = tk.Label(self.hero, bg=HERO_BG, fg=ACCENT,
-                         font=("Segoe UI", 30, "bold"), anchor="w", justify="left")
-        count.pack(anchor="w", pady=(0, 8), fill="x")
-        count.config(text=f"{v['resetDays']}天{v['resetHours']}时后重置",
-                     wraplength=self.W - 2 * self.R - 32)
+
+        big_row = tk.Frame(self.hero, bg=HERO_BG)
+        big_row.pack(fill="x", pady=(0, 8))
+        tk.Label(big_row, text=str(v["resetDays"]), bg=HERO_BG, fg=ACCENT,
+                 font=("Segoe UI", 48, "bold")).pack(side="left")
+        tk.Label(big_row, text=f"天{v['resetHours']}时后重置", bg=HERO_BG, fg=ACCENT,
+                 font=("Segoe UI", 14, "bold"), anchor="sw").pack(
+                     side="left", padx=(6, 0), pady=(0, 10))
 
         row = tk.Frame(self.hero, bg=HERO_BG)
         row.pack(fill="x")
         left = tk.Frame(row, bg=HERO_BG)
         left.pack(side="left")
-        b = self._badge(left, v["name"][0:1].upper(), v["color"], 20)
-        b.pack(side="left")
+        self._brand_widget(left, v["name"], v["color"], 20)
         tk.Label(left, text=v["name"], bg=HERO_BG, fg=TEXT,
                  font=("Segoe UI", 12, "bold")).pack(side="left", padx=(6, 0))
         tk.Label(row, text=v["resetDate"], bg=HERO_BG, fg=MUTED,
@@ -332,17 +358,25 @@ class WidgetApp:
     def _render_list(self, items):
         for w in self.list_area.winfo_children():
             w.destroy()
-        for v in items:
+        for i, v in enumerate(items):
             item = tk.Frame(self.list_area, bg=SURFACE,
                             highlightbackground=BORDER, highlightthickness=1)
-            item.pack(fill="x", pady=(0, 8), ipady=6, ipadx=4)
+            item.pack(fill="x", pady=(0, 8), ipady=6)
 
-            main = tk.Frame(item, bg=SURFACE)
-            main.pack(fill="x", padx=12, pady=(8, 0))
+            # 首项（最近重置）加金色左边条
+            if i == 0:
+                bar = tk.Frame(item, bg=ORANGE, width=3)
+                bar.pack(side="left", fill="y")
+                bar.pack_propagate(False)
+
+            content = tk.Frame(item, bg=SURFACE)
+            content.pack(side="left", fill="both", expand=True, padx=12, pady=(8, 0))
+
+            main = tk.Frame(content, bg=SURFACE)
+            main.pack(fill="x")
             left = tk.Frame(main, bg=SURFACE)
             left.pack(side="left")
-            b = self._badge(left, v["name"][0:1].upper(), v["color"], 22)
-            b.pack(side="left")
+            self._brand_widget(left, v["name"], v["color"], 22)
             tk.Label(left, text=v["name"], bg=SURFACE, fg=TEXT,
                      font=("Segoe UI", 13, "bold")).pack(side="left", padx=(8, 0))
 
@@ -355,15 +389,15 @@ class WidgetApp:
                      font=("Segoe UI", 10)).pack(anchor="e")
 
             # 进度条
-            track = tk.Frame(item, bg=TRACK, height=5)
-            track.pack(fill="x", padx=12, pady=(8, 0))
+            track = tk.Frame(content, bg=TRACK, height=5)
+            track.pack(fill="x", pady=(8, 0))
             track.pack_propagate(False)
             fill = tk.Frame(track, bg=v["bar"], height=5)
-            fill.place(relx=0, rely=0, relheight=1, relwidth=max(0, min(100, v["quotaPct"])) / 100)
+            fill.place(relx=0, rely=0, relheight=1,
+                       relwidth=max(0, min(100, v["quotaPct"])) / 100)
 
-            pct = tk.Frame(item, bg=SURFACE)
-            pct.pack(fill="x", padx=12, pady=(5, 8))
-            tk.Label(pct, text="", bg=SURFACE).pack(side="left")
+            pct = tk.Frame(content, bg=SURFACE)
+            pct.pack(fill="x", pady=(5, 8))
             tk.Label(pct, text=f"{v['quotaPct']}%", bg=SURFACE, fg=v["bar"],
                      font=("Segoe UI", 10)).pack(side="right")
 
