@@ -6,8 +6,12 @@
 ai-tools-data.json（与桌面小窗、浏览器版共用同一份文件）。
 实时额度仍需在页面右上角手动点 ↻ 拉取。
 """
+import ctypes
 import json
 import os
+import sys
+import time
+import threading
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(HERE, "ai-tools-data.json")
@@ -40,8 +44,31 @@ class Api:
         if self._window:
             self._window.destroy()
 
+    def win_start_drag(self):
+        """从当前鼠标位置开始原生拖动，窗口不会跳到别处。"""
+        hwnd = self._hwnd()
+        if not hwnd:
+            return False
+
+        def _drag():
+            user32 = ctypes.windll.user32
+            user32.ReleaseCapture()
+            # WM_NCLBUTTONDOWN + HTCAPTION：按住左键从点击处拖窗口
+            user32.SendMessageW(hwnd, 0x00A1, 2, 0)
+
+        native = getattr(self._window, "native", None)
+        try:
+            if native is not None and getattr(native, "InvokeRequired", False):
+                from System import Action
+                native.BeginInvoke(Action(_drag))
+                return True
+        except Exception:
+            pass
+        _drag()
+        return True
+
     def win_move(self, x, y):
-        """JS 拖动时调用：把窗口移动到手势算出的屏幕坐标。"""
+        """JS 回退拖动：传入的是屏幕坐标（screenX - clientX）。"""
         if self._window:
             self._window.move(int(x), int(y))
 
@@ -50,6 +77,20 @@ class Api:
         if self._window:
             return (self._window.x, self._window.y)
         return (0, 0)
+
+    def _hwnd(self):
+        native = getattr(self._window, "native", None) if self._window else None
+        if native is not None:
+            handle = getattr(native, "Handle", None)
+            if handle is not None:
+                try:
+                    return int(handle.ToInt64())
+                except Exception:
+                    try:
+                        return int(handle)
+                    except Exception:
+                        pass
+        return ctypes.windll.user32.GetForegroundWindow() or 0
 
     # ---- 数据 ----
     def get_data(self):
@@ -103,8 +144,13 @@ def main():
         # 没有 pywebview 时回退到浏览器 + 本地服务器
         import subprocess
         import webbrowser
+        py = sys.executable
+        if py.lower().endswith("python.exe"):
+            alt = py[:-10] + "pythonw.exe"
+            if os.path.exists(alt):
+                py = alt
         subprocess.Popen(
-            ["pythonw", os.path.join(HERE, "server.py"), "8099"],
+            [py, os.path.join(HERE, "server.py"), "8099"],
             cwd=HERE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         webbrowser.open("http://127.0.0.1:8099/index.html")
         return

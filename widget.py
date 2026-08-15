@@ -6,6 +6,7 @@
 最近到期工具列表及额度进度条；数据为手工维护，不自动刷新。
 """
 import os
+import sys
 import json
 import webbrowser
 import subprocess
@@ -15,12 +16,14 @@ import ctypes
 from ctypes import wintypes
 from datetime import datetime, timezone, timedelta
 
+_TK_IMPORT_ERROR = None
 try:
     import tkinter as tk
     import tkinter.font as tkfont
-except Exception:
+except Exception as e:
     tk = None
     tkfont = None
+    _TK_IMPORT_ERROR = e
 
 try:
     from PIL import Image, ImageTk, ImageDraw, ImageFilter
@@ -990,7 +993,7 @@ class WidgetApp:
 
         if has_webview and os.path.exists(fullview):
             try:
-                subprocess.Popen(["pythonw", fullview], cwd=HERE,
+                subprocess.Popen([_pythonw(), fullview], cwd=HERE,
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 return
             except Exception:
@@ -999,7 +1002,7 @@ class WidgetApp:
         url = f"http://127.0.0.1:{SERVER_PORT}/index.html"
         if not self._port_open(SERVER_PORT):
             try:
-                subprocess.Popen(["pythonw", os.path.join(HERE, "server.py"), str(SERVER_PORT)],
+                subprocess.Popen([_pythonw(), os.path.join(HERE, "server.py"), str(SERVER_PORT)],
                                  cwd=HERE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             except Exception:
                 pass
@@ -1017,14 +1020,46 @@ class WidgetApp:
         self.root.mainloop()
 
 
+def _pythonw():
+    """Same interpreter as this process, prefer pythonw so no extra console."""
+    exe = sys.executable
+    if exe.lower().endswith("python.exe"):
+        alt = exe[:-10] + "pythonw.exe"
+        if os.path.exists(alt):
+            return alt
+    return exe
+
+
+def _fail(msg):
+    """pythonw has no console; write a log and pop a message box."""
+    import traceback
+    log = os.path.join(HERE, "widget_error.log")
+    text = msg
+    if sys.exc_info()[1] is not None:
+        text = text + "\n\n" + traceback.format_exc()
+    try:
+        with open(log, "w", encoding="utf-8") as _f:
+            _f.write(text)
+    except Exception:
+        pass
+    try:
+        ctypes.windll.user32.MessageBoxW(0, text[:1500], "XueGao widget failed", 0x10)
+    except Exception:
+        pass
+    raise SystemExit(1)
+
+
 if __name__ == "__main__":
+    if tk is None:
+        _fail(
+            "This Python has no tkinter, so the desktop widget cannot start.\n\n"
+            f"Interpreter: {sys.executable}\n"
+            f"Reason: {_TK_IMPORT_ERROR}\n\n"
+            "Double-clicking often picks ESP-IDF pythonw "
+            "(C:\\Espressif\\tools\\idf-python\\), which has no Tcl/Tk.\n"
+            "Use official Python / Miniconda, or run the updated widget.bat."
+        )
     try:
         WidgetApp().run()
     except Exception:
-        import traceback
-        try:
-            with open(os.path.join(HERE, "widget_error.log"), "w", encoding="utf-8") as _f:
-                traceback.print_exc(file=_f)
-        except Exception:
-            pass
-        raise
+        _fail("The desktop widget crashed while starting.")

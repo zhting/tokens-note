@@ -692,26 +692,33 @@ window.addEventListener('pywebviewready', () => {
   const api = PYAPI();
   if (!api) return;
   document.body.classList.add('framed');
-  // 拖动：mousedown 时同步拿窗口位置，mousemove 算差值迁窗
+  // 拖动：优先走 Windows 原生标题栏拖动（从点击处跟手）。
+  // 旧写法同步解包 win_get_pos()，但 pywebview API 返回 Promise，
+  // 坐标会落成 (0,0)，窗口先跳到别处再拖。
   const tb = document.getElementById('titlebar');
   if (tb) {
-    let _moving = false, _sx = 0, _sy = 0, _wx = 0, _wy = 0;
-    tb.addEventListener('mousedown', e => {
-      if (e.target.closest('.tb-btn')) return;
-      _moving = true;
-      _sx = e.screenX; _sy = e.screenY;
-      try { [_wx, _wy] = api.win_get_pos(); } catch (_) {}
-      tb.style.cursor = 'grabbing';
+    tb.addEventListener('mousedown', async e => {
+      if (e.button !== 0 || e.target.closest('.tb-btn')) return;
       e.preventDefault();
-    });
-    window.addEventListener('mousemove', e => {
-      if (!_moving) return;
-      api.win_move(_wx + (e.screenX - _sx), _wy + (e.screenY - _sy));
-    });
-    window.addEventListener('mouseup', () => {
-      if (!_moving) return;
-      _moving = false;
-      tb.style.cursor = '';
+      tb.style.cursor = 'grabbing';
+      let native = false;
+      try {
+        native = await api.win_start_drag();
+      } catch (_) {}
+      if (native) {
+        tb.style.cursor = '';
+        return;
+      }
+      // 回退：用点击时相对窗口的偏移，而不是异步窗口坐标
+      const ox = e.clientX, oy = e.clientY;
+      const onMove = ev => { api.win_move(ev.screenX - ox, ev.screenY - oy); };
+      const onUp = () => {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        tb.style.cursor = '';
+      };
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
     });
   }
   const bMin = document.getElementById('tbMin');
