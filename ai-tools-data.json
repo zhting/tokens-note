@@ -18,7 +18,7 @@
     "created": "2026-08-13T02:00:19.209Z",
     "quotaLive": false,
     "quotaError": "暂不支持自动拉取",
-    "quotaFetchedAt": "2026-08-13T10:27:47Z"
+    "quotaFetchedAt": "2026-08-14T07:09:45Z"
   },
   {
     "id": "default1",
@@ -39,7 +39,7 @@
     "created": "2026-08-12T10:20:24.892888+00:00",
     "quotaLive": false,
     "quotaError": "Codex 登录已过期，请重新运行 codex login",
-    "quotaFetchedAt": "2026-08-13T10:27:47Z"
+    "quotaFetchedAt": "2026-08-14T07:09:45Z"
   },
   {
     "id": "default2",
@@ -60,7 +60,7 @@
     "created": "2026-08-12T10:20:24.892888+00:00",
     "quotaLive": false,
     "quotaError": "Claude 凭证为空或已失效，请重新 claude login",
-    "quotaFetchedAt": "2026-08-13T10:27:47Z"
+    "quotaFetchedAt": "2026-08-14T07:09:45Z"
   },
   {
     "id": "default3",
@@ -81,7 +81,7 @@
     "created": "2026-08-12T10:20:24.892888+00:00",
     "quotaLive": false,
     "quotaError": "未找到 Cursor 登录。把 Cookie 写到 quota-secrets.json 的 cursor_cookie，或安装并登录 Cursor",
-    "quotaFetchedAt": "2026-08-13T10:27:47Z"
+    "quotaFetchedAt": "2026-08-14T07:09:45Z"
   },
   {
     "id": "default4",
@@ -91,21 +91,21 @@
     "reset": {
       "period": "weekly",
       "day": 5,
-      "hour": 0,
-      "minute": 0
+      "hour": 14,
+      "minute": 30
     },
     "expiry": {
       "period": "monthly",
       "day": 26
     },
-    "quotaPct": 36.0,
+    "quotaPct": 0.0,
     "created": "2026-08-12T10:20:24.892888+00:00",
     "quotaLive": true,
     "quotaSource": "grok-billing",
-    "quotaDetail": "Grok 额度 36.0%",
-    "quotaFetchedAt": "2026-08-13T10:27:47Z",
+    "quotaDetail": "Grok 额度 0.0%",
+    "quotaFetchedAt": "2026-08-14T07:09:45Z",
     "quotaError": null,
-    "quotaResetAt": 1786687997
+    "quotaResetAt": 1787292797
   },
   {
     "id": "default5",
@@ -126,6 +126,6 @@
     "created": "2026-08-12T10:20:24.892888+00:00",
     "quotaLive": false,
     "quotaError": "Kimi 凭证无效，请重新登录 Kimi Code CLI 或填写 API key",
-    "quotaFetchedAt": "2026-08-13T10:27:47Z"
+    "quotaFetchedAt": "2026-08-14T07:09:45Z"
   }
 ]

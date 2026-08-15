@@ -573,7 +573,7 @@ class WidgetApp:
         self.menu = tk.Menu(self.root, tearoff=0,
                             bg=SURFACE, fg=TEXT, activebackground=SURFACE2,
                             activeforeground=TEXT, bd=0)
-        self.menu.add_command(label="↻ 刷新额度", command=self.refresh)
+        self.menu.add_command(label="↻ 刷新额度", command=self.refresh_quota)
         self.menu.add_command(label="🗔 打开完整视图", command=self.open_full_view)
         self.menu.add_checkbutton(label="📌 始终置顶", command=self.toggle_top,
                                   variable=tk.BooleanVar(value=True))
@@ -590,7 +590,6 @@ class WidgetApp:
 
         self._quota_busy = False
         self.refresh()
-        self.root.after(5 * 60 * 1000, self._quota_tick)
 
     # ---- 头部 ----
     def _build_header(self):
@@ -680,15 +679,12 @@ class WidgetApp:
 
     # ---- 渲染动态内容 ----
     def refresh(self):
+        """只读盘渲染，不联网。"""
         self._render_from_disk()
-        self._kick_live_quota()
 
-    def _quota_tick(self):
-        self.refresh()
-        try:
-            self.root.after(5 * 60 * 1000, self._quota_tick)
-        except Exception:
-            pass
+    def refresh_quota(self):
+        """手动拉取实时额度（右键「↻ 刷新额度」）。"""
+        self._kick_live_quota()
 
     def _kick_live_quota(self):
         if getattr(self, "_quota_busy", False):
@@ -984,6 +980,22 @@ class WidgetApp:
         self.root.attributes("-topmost", not cur)
 
     def open_full_view(self):
+        """打开集成 web 完整视图的原生窗口（fullview.py，pywebview）。"""
+        fullview = os.path.join(HERE, "fullview.py")
+        try:
+            import webview  # noqa: F401
+            has_webview = True
+        except Exception:
+            has_webview = False
+
+        if has_webview and os.path.exists(fullview):
+            try:
+                subprocess.Popen(["pythonw", fullview], cwd=HERE,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                return
+            except Exception:
+                pass
+        # 回退：本地服务器 + 默认浏览器
         url = f"http://127.0.0.1:{SERVER_PORT}/index.html"
         if not self._port_open(SERVER_PORT):
             try:
