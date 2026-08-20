@@ -14,7 +14,7 @@ import socket
 import threading
 import ctypes
 from ctypes import wintypes
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 
 _TK_IMPORT_ERROR = None
 try:
@@ -77,43 +77,61 @@ ICON_MAP = [
 
 
 # ---------- 纯逻辑 ----------
+def as_local_naive(dt):
+    """转成本机本地 naive datetime，与完整界面 `new Date()` 同一套时区。"""
+    if dt.tzinfo is None:
+        return dt
+    return dt.astimezone().replace(tzinfo=None)
+
+
 def next_date(cfg, now):
-    """根据 reset/expiry 配置，返回下一次发生的 UTC 时间。"""
-    d = now.replace(minute=0, second=0, microsecond=0)
+    """根据 reset/expiry 配置，返回下一次发生的本地时间（与完整界面一致）。"""
+    now = as_local_naive(now)
+    d = now.replace(second=0, microsecond=0)
     period = (cfg or {}).get("period", "monthly")
     day = (cfg or {}).get("day", 1)
-    hour = (cfg or {}).get("hour", 0)
-    minute = (cfg or {}).get("minute", 0)
+    hour = int((cfg or {}).get("hour") or 0)
+    minute = int((cfg or {}).get("minute") or 0)
 
     if period == "weekly":
-        jdow = (d.weekday() + 1) % 7
-        target = d.replace(hour=hour, minute=minute)
-        diff = (day - jdow + 7) % 7
+        jdow = (d.weekday() + 1) % 7  # 0=周日，对齐 JS Date#getDay()
+        target = d.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        diff = (int(day) - jdow + 7) % 7
         target = target + timedelta(days=diff)
         if target <= now:
             target = target + timedelta(days=7)
         return target
 
     if period == "daily":
-        target = d.replace(hour=hour, minute=minute)
+        target = d.replace(hour=hour, minute=minute, second=0, microsecond=0)
         if target <= now:
             target = target + timedelta(days=1)
         return target
 
-    target = datetime(now.year, now.month, day, hour, minute, tzinfo=timezone.utc)
+    target = datetime(now.year, now.month, int(day), hour, minute)
     if target <= now:
         y, m = target.year, target.month + 1
         if m > 12:
             y, m = y + 1, 1
-        target = datetime(y, m, day, hour, minute, tzinfo=timezone.utc)
+        target = datetime(y, m, int(day), hour, minute)
     return target
 
 
-def rel(ms):
-    total = max(0, int(ms / 1000))
+def rel(delta_seconds):
+    total = max(0, int(delta_seconds))
     days = total // 86400
     hours = (total % 86400) // 3600
-    return days, hours
+    minutes = (total % 3600) // 60
+    return days, hours, minutes
+
+
+def rel_label(days, hours, minutes=0):
+    """倒计时文案：不足 1 天时与完整界面一样显示「N小时 / N分钟」，避免出现 0天。"""
+    if days >= 1:
+        return f"{days}天{hours}时" if hours else f"{days}天"
+    if hours >= 1:
+        return f"{hours}小时"
+    return f"{minutes}分钟"
 
 
 def fmt(d):
@@ -148,13 +166,13 @@ def load_tools():
 
 
 def compute_views(tools, now=None):
-    now = now or datetime.now(timezone.utc)
+    now = as_local_naive(now or datetime.now())
     views = []
     for t in tools:
         reset = next_date(t.get("reset"), now)
         expiry = next_date(t.get("expiry"), now)
-        rd, rh = rel((reset - now).total_seconds() * 1000)
-        ed, eh = rel((expiry - now).total_seconds() * 1000)
+        rd, rh, rm = rel((reset - now).total_seconds())
+        ed, eh, em = rel((expiry - now).total_seconds())
         pct = int(round(t.get("quotaPct", 0) or 0))
         reset_h = rd * 24 + rh
         expiry_h = ed * 24 + eh
@@ -169,8 +187,9 @@ def compute_views(tools, now=None):
         views.append({
             "name": t.get("name", "?"),
             "quotaPct": pct,
-            "resetDays": rd, "resetHours": rh,
-            "expiryDays": ed, "expiryHours": eh,
+            "resetDays": rd, "resetHours": rh, "resetMinutes": rm,
+            "expiryDays": ed, "expiryHours": eh, "expiryMinutes": em,
+            "resetRel": rel_label(rd, rh, rm),
             "resetDate": fmt(reset), "expiryDate": fmt(expiry),
             "color": brand_color(t.get("name", "")),
             "bar": quota_color(pct),
@@ -719,7 +738,10 @@ class WidgetApp:
         views = compute_views(tools)
 
         # 按重置时间排序：hero 和列表都基于 reset
-        views = sorted(views, key=lambda v: v["resetDays"] * 24 + v["resetHours"])
+        views = sorted(
+            views,
+            key=lambda v: v["resetDays"] * 1440 + v["resetHours"] * 60 + v.get("resetMinutes", 0),
+        )
         hero = views[0]
         self._render_hero(hero)
         self._render_list(views[:6])
@@ -738,8 +760,20 @@ class WidgetApp:
         unit_fnt = tkfont.Font(family="Microsoft YaHei UI", size=11)
         hour_fnt = tkfont.Font(family="Segoe UI", size=18, weight="bold")
 
-        days = str(v["resetDays"])
-        hours = str(v["resetHours"])
+        days = v["resetDays"]
+        hours = v["resetHours"]
+        minutes = v.get("resetMinutes", 0)
+        # 与完整界面一致：不足 1 天时大数字显示小时/分钟，而不是 0 天
+        if days >= 1:
+            primary, primary_unit = str(days), "天"
+            secondary, secondary_unit = str(hours), "时后重置"
+        elif hours >= 1:
+            primary, primary_unit = str(hours), "小时后重置"
+            secondary, secondary_unit = None, None
+        else:
+            primary, primary_unit = str(minutes), "分钟后重置"
+            secondary, secondary_unit = None, None
+
         left = 10
         title_y = 8
         title_h = title_fnt.metrics("linespace")
@@ -757,18 +791,19 @@ class WidgetApp:
 
         cv.create_text(left, title_y, text="下一次重置", fill=MUTED,
                        font=title_fnt, anchor="nw")
-        cv.create_text(left, baseline - num_ascent, text=days, fill=ACCENT,
+        cv.create_text(left, baseline - num_ascent, text=primary, fill=ACCENT,
                        font=num_fnt, anchor="nw")
 
-        x = left + num_fnt.measure(days) + 10
-        cv.create_text(x, baseline - unit_ascent, text="天", fill=MUTED,
+        x = left + num_fnt.measure(primary) + 10
+        cv.create_text(x, baseline - unit_ascent, text=primary_unit, fill=MUTED,
                        font=unit_fnt, anchor="nw")
-        x += unit_fnt.measure("天") + 6
-        cv.create_text(x, baseline - hour_ascent, text=hours, fill=ACCENT,
-                       font=hour_fnt, anchor="nw")
-        x += hour_fnt.measure(hours) + 5
-        cv.create_text(x, baseline - unit_ascent, text="时后重置", fill=MUTED,
-                       font=unit_fnt, anchor="nw")
+        if secondary is not None:
+            x += unit_fnt.measure(primary_unit) + 6
+            cv.create_text(x, baseline - hour_ascent, text=secondary, fill=ACCENT,
+                           font=hour_fnt, anchor="nw")
+            x += hour_fnt.measure(secondary) + 5
+            cv.create_text(x, baseline - unit_ascent, text=secondary_unit, fill=MUTED,
+                           font=unit_fnt, anchor="nw")
 
 
     def _render_list(self, items):
@@ -796,7 +831,7 @@ class WidgetApp:
             tk.Label(left, text=v["name"], bg=SURFACE, fg=TEXT,
                      font=("Segoe UI", 12, "bold")).pack(side="left", padx=(6, 0))
 
-            tk.Label(top, text=f"{v['resetDays']}天{v['resetHours']}时",
+            tk.Label(top, text=v["resetRel"],
                      bg=SURFACE, fg=v["bar"], font=("Segoe UI", 13, "bold")).pack(side="right")
 
             # 第二行：进度条 | 百分比 日期
